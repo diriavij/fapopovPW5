@@ -20,6 +20,7 @@ final class NewsViewController: UIViewController {
         static let cornerRadius: CGFloat = 20
         static let pinOffset: Double = 10
         static let heightMultipier: CGFloat = 0.4
+        static let backgroundColor: UIColor = .black
     }
     
     // MARK: - Lifecycle
@@ -48,13 +49,12 @@ final class NewsViewController: UIViewController {
     // MARK: - Configuring Methods
     
     private func configureUI() {
-        view.backgroundColor = .white
         configureTable()
     }
     
     private func configureTable() {
         view.addSubview(tableView)
-        tableView.backgroundColor = .white
+        tableView.backgroundColor = Const.backgroundColor
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorStyle = .none
