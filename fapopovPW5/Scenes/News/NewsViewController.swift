@@ -14,6 +14,7 @@ final class NewsViewController: UIViewController {
     
     private var interactor: (NewsBusinessLogic & NewsDataStore)?
     private let tableView = UITableView(frame: .zero)
+    private var news: [ArticleModel] = []
     
     private enum Const {
         static let cornerRadius: CGFloat = 20
@@ -35,7 +36,13 @@ final class NewsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        interactor?.loadFreshNews(News.LoadFresh.Request())
         configureUI()
+    }
+    
+    func displayFreshNews(_ viewModel: News.LoadFresh.ViewModel) {
+        news = viewModel.displayedNews
+        tableView.reloadData()
     }
     
     // MARK: - Configuring Methods
@@ -67,7 +74,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return news.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -78,7 +85,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         
         guard let articleCell = cell as? ArticleCell else { return cell }
         
-        articleCell.configure()
+        articleCell.configure(with: news[indexPath.row])
        
         return articleCell
     }

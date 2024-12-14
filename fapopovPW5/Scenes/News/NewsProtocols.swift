@@ -7,14 +7,14 @@
 
 // MARK: - NewsBusinessLogic
 protocol NewsBusinessLogic {
-    func loadFreshNews(_ request: News.Other.Request)
-    func loadMoreNews(_ request: News.Other.Request)
+    func loadFreshNews(_ request: News.LoadFresh.Request)
+    func loadMoreNews(_ request: News.LoadFresh.Request)
 }
 
 // MARK: - NewsPresentationLogic
 protocol NewsPresentationLogic {
-    func presentFreshNews(_ response: News.Other.Response)
-    func presentMoreNews(_ response: News.Other.Response)
+    func presentFreshNews(_ response: News.LoadFresh.Response)
+    func presentMoreNews(_ response: News.LoadFresh.Response)
     
     func routeTo()
 }

@@ -7,9 +7,13 @@
 
 // MARK: - News
 enum News {
-    enum Other {
+    enum LoadFresh {
         struct Request {}
-        struct Response {}
-        struct ViewModel {}
+        struct Response {
+            var news: [ArticleModel]
+        }
+        struct ViewModel {
+            var displayedNews: [ArticleModel]
+        }
     }
 }

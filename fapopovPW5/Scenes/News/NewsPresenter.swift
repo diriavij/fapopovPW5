@@ -13,11 +13,11 @@ final class NewsPresenter: NewsPresentationLogic {
     weak var view: NewsViewController?
     
     // MARK: - Methods
-    func presentFreshNews(_ response: News.Other.Response) {
-        
+    func presentFreshNews(_ response: News.LoadFresh.Response) {
+        view?.displayFreshNews(News.LoadFresh.ViewModel(displayedNews: response.news))
     }
     
-    func presentMoreNews(_ response: News.Other.Response) {
+    func presentMoreNews(_ response: News.LoadFresh.Response) {
         
     }
     
