@@ -23,6 +23,9 @@ final class WebArticleViewController: UIViewController {
         static let buttonText = "Return"
         static let buttonFont: UIFont = .systemFont(ofSize: 18, weight: UIFont.Weight(3))
         static let cornerRadius: CGFloat = 20
+        static let webViewTopOffset: Double = 50
+        static let buttonHeight: Double = 40
+        static let buttonWidth: Double = 100
     }
     
     // MARK: - Lifecycle
@@ -46,7 +49,7 @@ final class WebArticleViewController: UIViewController {
     private func configureUI() {
         view.addSubview(webView)
         webView.pinHorizontal(to: view)
-        webView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, 50)
+        webView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, Const.webViewTopOffset)
         webView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
         if let url = articleUrl {
             webView.load(URLRequest(url: url))
@@ -60,8 +63,8 @@ final class WebArticleViewController: UIViewController {
         returnButton.layer.cornerRadius = Const.cornerRadius
         returnButton.pinCenterX(to: view.centerXAnchor)
         returnButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        returnButton.setHeight(40)
-        returnButton.setWidth(100)
+        returnButton.setHeight(Const.buttonHeight)
+        returnButton.setWidth(Const.buttonWidth)
         returnButton.backgroundColor = .white
         returnButton.titleLabel?.textColor = .black
         view.bringSubviewToFront(returnButton)

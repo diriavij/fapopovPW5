@@ -36,6 +36,10 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
         
     }
     
+    func loadShare(_ request: News.Share.Request) {
+        presenter.presentShare(News.Share.Response(url: request.url))
+    }
+    
     func loadArticle(_ request: News.ShowArticle.Request) {
         presenter.routeToArticle(News.ShowArticle.Response(articleURL: request.article.articleUrl))
     }

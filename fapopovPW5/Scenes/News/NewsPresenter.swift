@@ -21,6 +21,13 @@ final class NewsPresenter: NewsPresentationLogic {
         
     }
     
+    func presentShare(_ response: News.Share.Response) {
+        let urlToShare = [response.url]
+        let activityViewController = UIActivityViewController(activityItems: urlToShare as [Any], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = view?.view
+        view?.present(activityViewController, animated: true)
+    }
+    
     func routeToArticle(_ response: News.ShowArticle.Response) {
         let articleViewController = WebArticleAssembly.build()
         articleViewController.articleUrl = response.articleURL

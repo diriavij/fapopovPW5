@@ -26,8 +26,16 @@ enum News {
         struct Response {
             var articleURL: URL?
         }
-        struct ViewModel {
-
+        struct ViewModel {}
+    }
+    
+    enum Share {
+        struct Request {
+            var url: URL?
         }
+        struct Response {
+            var url: URL?
+        }
+        struct ViewModel {}
     }
 }

@@ -21,6 +21,7 @@ final class NewsViewController: UIViewController {
         static let pinOffset: Double = 10
         static let heightMultipier: CGFloat = 0.4
         static let backgroundColor: UIColor = .black
+        static let actionColor: UIColor = .systemCyan
     }
     
     // MARK: - Lifecycle
@@ -62,6 +63,10 @@ final class NewsViewController: UIViewController {
         tableView.pin(to: view, Const.pinOffset)
         tableView.register(ArticleCell.self, forCellReuseIdentifier: ArticleCell.reuseId)
     }
+    
+    private func handleShare(_ articleUrl: URL?) {
+        interactor?.loadShare(News.Share.Request(url: articleUrl))
+    }
 
 }
 
@@ -92,6 +97,15 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
         interactor?.loadArticle(News.ShowArticle.Request(article: news[indexPath.row]))
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let action = UIContextualAction(style: .normal, title: "Share") { [weak self] (action, view, completionHandler) in
+            self?.handleShare(self?.news[indexPath.row].articleUrl)
+            completionHandler(true)
+        }
+        action.backgroundColor = Const.actionColor
+        return UISwipeActionsConfiguration(actions: [action])
     }
 }
 
