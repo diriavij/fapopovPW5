@@ -124,16 +124,13 @@ final class ArticleCell: UITableViewCell {
     private func loadImage(_ url: URL) -> UIImage? {
         var resultData: Data = Data()
         let semaphore = DispatchSemaphore(value: 0)
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        URLSession.shared.dataTask(with: url) { data, response, error in
             if let _ = error {
                 print(error ?? "Error")
                 semaphore.signal()
                 return
             }
-            if
-                let self,
-                let data = data
-            {
+            if let data = data {
                 resultData = data
             }
             semaphore.signal()

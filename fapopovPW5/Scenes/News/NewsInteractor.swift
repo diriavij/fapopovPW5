@@ -36,5 +36,7 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
         
     }
     
-    
+    func loadArticle(_ request: News.ShowArticle.Request) {
+        presenter.routeToArticle(News.ShowArticle.Response(articleURL: request.article.articleUrl))
+    }
 }

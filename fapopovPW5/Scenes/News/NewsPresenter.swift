@@ -21,7 +21,10 @@ final class NewsPresenter: NewsPresentationLogic {
         
     }
     
-    func routeTo() {
-        
+    func routeToArticle(_ response: News.ShowArticle.Response) {
+        let articleViewController = WebArticleAssembly.build()
+        articleViewController.articleUrl = response.articleURL
+        articleViewController.modalPresentationStyle = .fullScreen
+        view?.present(articleViewController, animated: true)
     }
 }

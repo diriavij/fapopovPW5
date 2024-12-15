@@ -89,4 +89,9 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
        
         return articleCell
     }
+    
+    func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        interactor?.loadArticle(News.ShowArticle.Request(article: news[indexPath.row]))
+    }
 }
+
