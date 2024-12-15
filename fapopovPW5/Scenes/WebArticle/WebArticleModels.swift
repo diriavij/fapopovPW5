@@ -13,4 +13,14 @@ enum Article {
         struct Response {}
         struct ViewModel {}
     }
+    
+    enum Share {
+        struct Request {
+            var url: URL?
+        }
+        struct Response {
+            var url: URL?
+        }
+        struct ViewModel {}
+    }
 }

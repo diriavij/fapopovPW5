@@ -18,14 +18,12 @@ final class WebArticleViewController: UIViewController {
     
     private let webView: WKWebView = WKWebView()
     private let returnButton: UIButton = UIButton(type: .system)
+    private let nav = UINavigationBar()
     
     enum Const {
-        static let buttonText = "Return"
-        static let buttonFont: UIFont = .systemFont(ofSize: 18, weight: UIFont.Weight(3))
-        static let cornerRadius: CGFloat = 20
-        static let webViewTopOffset: Double = 50
-        static let buttonHeight: Double = 40
-        static let buttonWidth: Double = 100
+        static let backgroundColor: UIColor = .black
+        static let navBarTitle = "Seldon.News"
+        static let backButtonText = "Back"
     }
     
     // MARK: - Lifecycle
@@ -47,31 +45,48 @@ final class WebArticleViewController: UIViewController {
     // MARK: - Configuring Methods
     
     private func configureUI() {
+        view.backgroundColor = Const.backgroundColor
+        configureWebView()
+        configureNavigationBar()
+    }
+    
+    private func configureWebView() {
         view.addSubview(webView)
         webView.pinHorizontal(to: view)
-        webView.pinTop(to: view.safeAreaLayoutGuide.topAnchor, Const.webViewTopOffset)
+        webView.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
         webView.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor)
         if let url = articleUrl {
             webView.load(URLRequest(url: url))
         }
-        view.backgroundColor = webView.themeColor
-        
-        view.addSubview(returnButton)
-        returnButton.addTarget(self, action: #selector(returnToNews), for: .touchUpInside)
-        returnButton.setTitle(Const.buttonText, for: .normal)
-        returnButton.setTitleColor(.black, for: .normal)
-        returnButton.layer.cornerRadius = Const.cornerRadius
-        returnButton.pinCenterX(to: view.centerXAnchor)
-        returnButton.pinTop(to: view.safeAreaLayoutGuide.topAnchor)
-        returnButton.setHeight(Const.buttonHeight)
-        returnButton.setWidth(Const.buttonWidth)
-        returnButton.backgroundColor = .white
-        returnButton.titleLabel?.textColor = .black
-        view.bringSubviewToFront(returnButton)
+    }
+    
+    private func configureNavigationBar() {
+        title = Const.navBarTitle
+        let backButton = UIBarButtonItem(
+            title: Const.backButtonText,
+            style: .plain,
+            target: self,
+            action: #selector(returnToPrevious)
+        )
+        let shareButton = UIBarButtonItem(
+            barButtonSystemItem: .action,
+            target: self,
+            action: #selector(shareArticle)
+        )
+        navigationItem.leftBarButtonItem = backButton
+        navigationItem.rightBarButtonItem = shareButton
+    }
+    
+    // MARK: - Actions
+    
+    @objc
+    private func returnToPrevious() {
+        interactor.loadNews(Article.ShowNews.Request())
     }
     
     @objc
-    private func returnToNews() {
-        interactor.loadNews(Article.ShowNews.Request())
+    private func shareArticle() {
+        interactor.loadShare(Article.Share.Request(url: articleUrl))
     }
+    
 }

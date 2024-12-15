@@ -9,6 +9,7 @@ import Foundation
 
 // MARK: - WebArticleInteractor
 final class WebArticleInteractor: WebArticleBusinessLogic {
+    
     // MARK: - Presenter
     private let presenter: WebArticlePresentationLogic
     
@@ -20,5 +21,9 @@ final class WebArticleInteractor: WebArticleBusinessLogic {
     // MARK: - Methods
     func loadNews(_ request: Article.ShowNews.Request) {
         presenter.routeToNews(Article.ShowNews.Response())
+    }
+    
+    func loadShare(_ request: Article.Share.Request) {
+        presenter.presentShare(Article.Share.Response(url: request.url))
     }
 }
