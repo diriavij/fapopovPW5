@@ -19,6 +19,18 @@ enum News {
         }
     }
     
+    enum LoadMore {
+        struct Request {
+            var pageIndex: Int
+        }
+        struct Response {
+            var news: [ArticleModel]
+        }
+        struct ViewModel {
+            var displayedNews: [ArticleModel]
+        }
+    }
+    
     enum ShowArticle {
         struct Request {
             var article: ArticleModel

@@ -17,8 +17,8 @@ final class NewsPresenter: NewsPresentationLogic {
         view?.displayFreshNews(News.LoadFresh.ViewModel(displayedNews: response.news))
     }
     
-    func presentMoreNews(_ response: News.LoadFresh.Response) {
-        
+    func presentMoreNews(_ response: News.LoadMore.Response) {
+        view?.displayMoreNews(News.LoadMore.ViewModel(displayedNews: response.news))
     }
     
     func presentShare(_ response: News.Share.Response) {

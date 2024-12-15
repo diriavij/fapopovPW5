@@ -25,8 +25,8 @@ final class ArticleWorker {
     }
     
     // MARK: - Fetch news
-    func fetchNews() -> [ArticleModel] {
-        guard let url = getURL(4, 1) else { return [] }
+    func fetchNews(_ pageIndex: Int) -> [ArticleModel] {
+        guard let url = getURL(4, pageIndex) else { return [] }
         let semaphore = DispatchSemaphore(value: 0)
         var result: [ArticleModel] = []
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in

@@ -21,6 +21,8 @@ final class ArticleCell: UITableViewCell {
     private let image = UIImageView()
     private var articleUrl: URL?
     private let background = UIView()
+    private let shimmerView = UIView()
+    private var gradientLayer: CAGradientLayer?
     
     // MARK: - Constants
     
@@ -36,7 +38,21 @@ final class ArticleCell: UITableViewCell {
         static let titleFont: UIFont = .systemFont(ofSize: 14, weight: UIFont.Weight(3))
         static let announceFont: UIFont = .systemFont(ofSize: 12)
         static let numberOfAnnounceLines = 4
-
+        
+        static let alpha = 0.7
+        static let heightMultiplier = 0.55
+        
+        static let startPoint = CGPoint(x: 0, y: 0.5)
+        static let endPoint = CGPoint(x: 1, y: 0.5)
+        static let locations: [NSNumber] = [0.0, 0.5, 1.0]
+        
+        static let fromValue = [-1.0, -0.5, 0.0]
+        static let toValue = [1.0, 1.5, 2.0]
+        static let duration = 1.5
+        
+        static let animationKey = "shimmerAnimation"
+        static let keyPath = "locations"
+        
         static let placeholderImageURL = URL(fileURLWithPath: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png")
     }
     
@@ -52,21 +68,74 @@ final class ArticleCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer?.frame = shimmerView.bounds
+    }
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        
+        if window != nil {
+            startShimmerAnimation()
+        } else {
+            gradientLayer?.removeAnimation(forKey: Const.animationKey)
+        }
+    }
+    
     // MARK: - Configuring Methods
     
     func configure(with article: ArticleModel) {
         titleLabel.text = article.title
         announceLabel.text = article.announce
         articleUrl = article.articleUrl
+        
+        shimmerView.isHidden = false
         image.image = loadImage(article.img?.url ?? Const.placeholderImageURL)
     }
     
     private func configureUI() {
         configureCell()
         configureImage()
+        configureShimmer()
         configureBackground()
         configureTitle()
         configureAnnounce()
+    }
+    
+    private func configureShimmer() {
+        wrapView.addSubview(shimmerView)
+        shimmerView.pin(to: wrapView)
+        shimmerView.layer.cornerRadius = Const.cornerRadius
+        shimmerView.clipsToBounds = true
+        
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor.darkGray.cgColor,
+            UIColor.lightGray.cgColor,
+            UIColor.darkGray.cgColor
+        ]
+        gradient.locations = Const.locations
+        gradient.startPoint = Const.startPoint
+        gradient.endPoint = Const.endPoint
+        gradient.frame = shimmerView.bounds
+        
+        shimmerView.layer.addSublayer(gradient)
+        self.gradientLayer = gradient
+        
+        startShimmerAnimation()
+    }
+    
+    private func startShimmerAnimation() {
+        guard let gradient = gradientLayer else { return }
+        
+        let animation = CABasicAnimation(keyPath: Const.keyPath)
+        animation.fromValue = Const.fromValue
+        animation.toValue = Const.toValue
+        animation.duration = Const.duration
+        animation.repeatCount = .infinity
+        
+        gradient.add(animation, forKey: Const.animationKey)
     }
     
     private func configureBackground() {
@@ -74,17 +143,17 @@ final class ArticleCell: UITableViewCell {
         background.pinTop(to: wrapView.topAnchor)
         background.pinLeft(to: wrapView.leadingAnchor)
         background.pinRight(to: wrapView.trailingAnchor)
-        background.pinHeight(to: wrapView, 0.5)
+        background.pinHeight(to: wrapView, Const.heightMultiplier)
         background.backgroundColor = Const.backgroundColor
-        background.alpha = 0.7
+        background.alpha = Const.alpha
         background.layer.cornerRadius = Const.cornerRadius
     }
     
     private func configureAnnounce() {
         addSubview(announceLabel)
         announceLabel.textColor = Const.textColor
-        announceLabel.pinHorizontal(to: wrapView, 20)
-        announceLabel.pinTop(to: titleLabel.bottomAnchor, 10)
+        announceLabel.pinHorizontal(to: wrapView, Const.horizontalOffset)
+        announceLabel.pinTop(to: titleLabel.bottomAnchor, Const.pinOffset)
         announceLabel.font = Const.announceFont
         announceLabel.numberOfLines = Const.numberOfAnnounceLines
     }
@@ -115,23 +184,22 @@ final class ArticleCell: UITableViewCell {
     private func configureTitle() {
         addSubview(titleLabel)
         titleLabel.textColor = Const.titleColor
-        titleLabel.pinHorizontal(to: wrapView, 20)
-        titleLabel.pinTop(to: wrapView.topAnchor, 10)
+        titleLabel.pinHorizontal(to: wrapView, Const.horizontalOffset)
+        titleLabel.pinTop(to: wrapView.topAnchor, Const.pinOffset)
         titleLabel.font = Const.titleFont
         titleLabel.numberOfLines = Const.numberOfLines
     }
     
     private func loadImage(_ url: URL) -> UIImage? {
-        var resultData: Data = Data()
+        let resultData: Data = Data()
         let semaphore = DispatchSemaphore(value: 0)
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let _ = error {
-                print(error ?? "Error")
-                semaphore.signal()
-                return
-            }
-            if let data = data {
-                resultData = data
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let self = self else { return }
+            if let data = data, let loadedImage = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.image.image = loadedImage
+                    self.shimmerView.isHidden = true
+                }
             }
             semaphore.signal()
         }.resume()

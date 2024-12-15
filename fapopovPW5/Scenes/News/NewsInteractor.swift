@@ -18,6 +18,7 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
     
     private enum Const {
         static let baseURL = "https://news.myseldon.com/api"
+        static let freshIndex = 1
     }
     
     // MARK: - Lifecycle
@@ -28,12 +29,14 @@ final class NewsInteractor: NewsBusinessLogic, NewsDataStore {
     // MARK: - Methods
     func loadFreshNews(_ request: News.LoadFresh.Request) {
         let worker = ArticleWorker()
-        let result = worker.fetchNews()
+        let result = worker.fetchNews(Const.freshIndex)
         presenter.presentFreshNews(News.LoadFresh.Response(news: result))
     }
     
-    func loadMoreNews(_ request: News.LoadFresh.Request) {
-        
+    func loadMoreNews(_ request: News.LoadMore.Request) {
+        let worker = ArticleWorker()
+        let result = worker.fetchNews(request.pageIndex)
+        presenter.presentMoreNews(News.LoadMore.Response(news: result))
     }
     
     func loadShare(_ request: News.Share.Request) {
