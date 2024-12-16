@@ -19,10 +19,10 @@ final class NewsViewController: UIViewController {
     private let floatingButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "arrow.up.circle.fill"), for: .normal)
-        button.tintColor = .systemCyan
-        button.layer.cornerRadius = 25
+        button.tintColor = Const.actionColor
+        button.layer.cornerRadius = Const.buttonCornerRadius
         button.clipsToBounds = true
-        button.backgroundColor = .white
+        button.backgroundColor = Const.buttonBackgroundColor
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -39,6 +39,7 @@ final class NewsViewController: UIViewController {
         static let pinOffset: Double = 10
         static let heightMultipier: CGFloat = 0.4
         static let backgroundColor: UIColor = .black
+        static let buttonBackgroundColor: UIColor = .white
         static let actionColor: UIColor = .systemCyan
         static let actionText = "Share"
         static let threshold = 100.0
@@ -49,6 +50,9 @@ final class NewsViewController: UIViewController {
         static let beginAlpha = 0.0
         static let endAlpha = 1.0
         static let feedCapacity = 10
+        static let buttonSize: Double = 50
+        static let buttonOffset: Double = 20
+        static let buttonCornerRadius: CGFloat = 25
     }
     
     // MARK: - Lifecycle
@@ -116,12 +120,10 @@ final class NewsViewController: UIViewController {
     
     func configureFloatingButton() {
         view.addSubview(floatingButton)
-        NSLayoutConstraint.activate([
-            floatingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            floatingButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            floatingButton.widthAnchor.constraint(equalToConstant: 50),
-            floatingButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
+        floatingButton.pinRight(to: view.trailingAnchor, Const.buttonOffset)
+        floatingButton.pinBottom(to: view.bottomAnchor, Const.buttonSize)
+        floatingButton.setWidth(Const.buttonSize)
+        floatingButton.setHeight(Const.buttonSize)
         floatingButton.isHidden = true
         floatingButton.addTarget(self, action: #selector(scrollToTop), for: .touchUpInside)
     }
