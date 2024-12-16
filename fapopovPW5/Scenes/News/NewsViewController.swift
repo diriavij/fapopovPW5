@@ -15,6 +15,18 @@ final class NewsViewController: UIViewController {
     private var interactor: (NewsBusinessLogic & NewsDataStore)?
     private let tableView = UITableView(frame: .zero)
     private let refreshControl = UIRefreshControl()
+    
+    private let floatingButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(systemName: "arrow.up.circle.fill"), for: .normal)
+        button.tintColor = .systemCyan
+        button.layer.cornerRadius = 25
+        button.clipsToBounds = true
+        button.backgroundColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private var news: [ArticleModel] = []
     private var currentIndex = 1
     
@@ -30,7 +42,13 @@ final class NewsViewController: UIViewController {
         static let actionColor: UIColor = .systemCyan
         static let actionText = "Share"
         static let threshold = 100.0
+        static let buttonAppears = 200.0
         static let timeInterval = 0.1
+        static let delay = 0.05
+        static let duration = 0.5
+        static let beginAlpha = 0.0
+        static let endAlpha = 1.0
+        static let feedCapacity = 10
     }
     
     // MARK: - Lifecycle
@@ -62,8 +80,13 @@ final class NewsViewController: UIViewController {
     
     func displayMoreNews(_ viewModel: News.LoadMore.ViewModel) {
         isLoadingMore = false
+        let startIndex = news.count
+        let endIndex = startIndex + viewModel.displayedNews.count - 1
+        let indexPaths = (startIndex...endIndex).map { IndexPath(row: $0, section: 0) }
         news.append(contentsOf: viewModel.displayedNews)
-        tableView.reloadData()
+        tableView.performBatchUpdates({
+            tableView.insertRows(at: indexPaths, with: .fade)
+        }, completion: nil)
     }
     
     // MARK: - Configuring Methods
@@ -71,6 +94,7 @@ final class NewsViewController: UIViewController {
     private func configureUI() {
         configureTable()
         configureRefreshControl()
+        configureFloatingButton()
     }
     
     private func configureTable() {
@@ -90,10 +114,26 @@ final class NewsViewController: UIViewController {
         refreshControl.tintColor = Const.actionColor
     }
     
+    func configureFloatingButton() {
+        view.addSubview(floatingButton)
+        NSLayoutConstraint.activate([
+            floatingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            floatingButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            floatingButton.widthAnchor.constraint(equalToConstant: 50),
+            floatingButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+        floatingButton.isHidden = true
+        floatingButton.addTarget(self, action: #selector(scrollToTop), for: .touchUpInside)
+    }
+    
     // MARK: - Actions
     
     private func handleShare(_ articleUrl: URL?) {
         interactor?.loadShare(News.Share.Request(url: articleUrl))
+    }
+    
+    @objc private func scrollToTop() {
+        tableView.setContentOffset(.zero, animated: true)
     }
     
     @objc
@@ -113,7 +153,7 @@ final class NewsViewController: UIViewController {
     private func loadMoreNews() {
         guard !isLoadingMore else { return }
         isLoadingMore = true
-        if currentIndex <= 10 {
+        if currentIndex <= Const.feedCapacity {
             currentIndex += 1
             interactor?.loadMoreNews(News.LoadMore.Request(pageIndex: currentIndex))
         }
@@ -152,6 +192,13 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         return articleCell
     }
     
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.alpha = Const.beginAlpha
+        UIView.animate(withDuration: Const.duration, delay: Const.delay * Double(indexPath.row), animations: {
+            cell.alpha = Const.endAlpha
+        })
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         interactor?.loadArticle(News.ShowArticle.Request(article: news[indexPath.row]))
     }
@@ -166,6 +213,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        floatingButton.isHidden = scrollView.contentOffset.y < Const.buttonAppears
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         if offsetY > contentHeight - scrollView.frame.height - Const.threshold {

@@ -32,7 +32,8 @@ final class NewsPresenter: NewsPresentationLogic {
         let articleViewController = WebArticleAssembly.build()
         articleViewController.articleUrl = response.articleURL
         let navController = UINavigationController(rootViewController: articleViewController)
-        navController.modalPresentationStyle = .fullScreen
+        navController.modalPresentationStyle = .overFullScreen
+        navController.modalTransitionStyle = .crossDissolve
         view?.present(navController, animated: true)
     }
 }
